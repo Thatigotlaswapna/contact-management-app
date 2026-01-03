@@ -1,0 +1,39 @@
+# Contact Management App
+
+A simple **Contact Management Web App** built using the MERN stack.
+
+---
+
+## 🛠️ Tech Stack
+
+- **MongoDB** – Database
+- **Express.js** – Backend framework
+- **React.js** – Frontend library
+- **Node.js** – Server runtime
+- **CSS / HTML / JavaScript** – Frontend styling and logic
+
+---
+
+## 🚀 Features
+
+- Add, view, and delete contacts
+- Responsive UI
+- Full CRUD functionality
+
+---
+
+## 📦 Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Thatigotlaswapna/contact-management-app.git
+
+# Go to backend
+cd backend
+npm install
+npm start
+
+# Go to frontend
+cd ../frontend
+npm install
+npm start
