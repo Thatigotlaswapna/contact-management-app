@@ -1,37 +1,83 @@
-import React, { useEffect, useState } from "react";
-import { getContacts, addContact, deleteContact } from "./services/api";
-import AddContact from "./components/AddContact";
-import ContactList from "./components/ContactList";
-import "./App.css";
+import { useState, useEffect } from "react";
+
+// Use the environment variable for backend API
+const API_URL = process.env.REACT_APP_API_URL;
 
 function App() {
   const [contacts, setContacts] = useState([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
-  const fetchContacts = async () => {
-    const data = await getContacts();
-    setContacts(data);
-  };
-
+  // Fetch contacts from backend on load
   useEffect(() => {
-    fetchContacts();
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setContacts(data))
+      .catch((err) => console.error("Error fetching contacts:", err));
   }, []);
 
-  const handleAddContact = async (contact) => {
-    await addContact(contact);
-    fetchContacts();
+  // Add new contact
+  const handleAddContact = async () => {
+    if (!name || !email || !phone) return alert("Fill all fields");
+
+    const newContact = { name, email, phone };
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newContact),
+      });
+      const savedContact = await res.json();
+      setContacts([...contacts, savedContact]);
+      setName(""); setEmail(""); setPhone("");
+    } catch (err) {
+      console.error("Error adding contact:", err);
+    }
   };
 
-  const handleDeleteContact = async (id) => {
-    await deleteContact(id);
-    fetchContacts();
+  // Delete contact
+  const handleDelete = async (id) => {
+    try {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      setContacts(contacts.filter((c) => c._id !== id));
+    } catch (err) {
+      console.error("Error deleting contact:", err);
+    }
   };
 
   return (
-    <div className="app-container">
+    <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
       <h1>Contact Management App</h1>
 
-      <AddContact onAdd={handleAddContact} />
-      <ContactList contacts={contacts} onDelete={handleDeleteContact} />
+      <h2>Add Contact</h2>
+      <input
+        placeholder="Full Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        placeholder="Email Address"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <input
+        placeholder="Phone Number"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+      />
+      <button onClick={handleAddContact}>Add Contact</button>
+
+      <h2>Contact List</h2>
+      <ul>
+        {contacts.map((contact) => (
+          <li key={contact._id}>
+            <strong>{contact.name}</strong> — {contact.email} — {contact.phone}{" "}
+            <button onClick={() => handleDelete(contact._id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
